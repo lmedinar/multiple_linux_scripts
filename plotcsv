@@ -1,0 +1,77 @@
+#!/usr/bin/octave -qf
+
+## archivos = argv();
+## printf(archivos{1}) # Para mostrar un nombre de archivo
+## printf('\n')
+clear all;
+close all;
+huesUnorm = [];
+datosX = {};
+datosY = {};
+leyendas = {};
+errorFlag = 0;
+archivos = argv();
+for i = 1:length(archivos)
+  printf('Extrayendo información desde %s\n',archivos{i});
+  finalTexto = length(archivos{i});
+  hue_temp = sum(archivos{i}(floor(finalTexto/2):finalTexto-5));
+  data = csvread(archivos{i});
+  [filas,columnas] = size(data);
+  if !(mod(filas,2) == 0)
+    printf('\nERROR: este archivo no tiene una cantidad de filas par\n');
+    errorFlag = 1;
+    input('Presione [enter] para salir...');
+    break;
+  endif
+  for di = 1:filas
+    if mod(di,2) == 1
+      datosX{end+1} = data(di,:);
+    else
+      datosY{end+1} = data(di,:);
+      huesUnorm(end+1) = hue_temp-850;
+      leyendas{end+1} = strjoin(strsplit(archivos{i},'_')," ");
+    endif
+    
+  endfor
+  
+  ## cvsread()
+endfor
+
+## hues = huesUnorm/max(huesUnorm);
+## colors = ones(length(hues),3)*0.5;
+## colors(:,1) = hues';
+
+colors = [
+	  240,30,15;
+	  196,51,49;
+	  207,140,52;
+	  163,168,41;
+	  106,175,44;
+	  45,183,65;
+	  48,190,152;
+	  52,112,207;
+	  73,60,240;
+	  160,54,218;
+	  161,40,137;
+	  206,51,61
+	 ]/255;
+
+final = figure(1,"position",get(0,"screensize"));
+## figure;
+hold on;
+
+for d = 1:length(datosX)
+  ## printf("Mostrando\n")
+  ci = mod(d,length(colors(1,:))) + 1;
+  plot(datosX{d},datosY{d},'color',colors(d,:));
+endfor
+## leyendas
+lg = legend(leyendas);
+set(lg,'location','northeastoutside')
+
+if errorFlag == 0
+		   # Ponemos este input para que deje ver las gráficas
+  ## input('Gráficas generadas, presione [enter] para salir...');
+  printf("Gráficas generadas con éxito...\n")
+endif
+waitfor(final);

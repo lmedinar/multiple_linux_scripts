@@ -1,0 +1,237 @@
+#!/usr/bin/env python
+import sys
+import os
+
+#         _
+#  __ ___| |___ _ _ ___ ___
+# / _/ _ \ / _ \ '_/ -_|_-<
+# \__\___/_\___/_| \___/__/
+#
+
+
+class colors:
+    reset = "\033[0m"
+    bold = "\033[01m"
+    disable = "\033[02m"
+    underline = "\033[04m"
+    reverse = "\033[07m"
+    strikethrough = "\033[09m"
+    invisible = "\033[08m"
+
+    class fg:
+        black = "\033[30m"
+        red = "\033[31m"
+        green = "\033[32m"
+        orange = "\033[33m"
+        blue = "\033[34m"
+        purple = "\033[35m"
+        cyan = "\033[36m"
+        lightgrey = "\033[37m"
+        darkgrey = "\033[90m"
+        lightred = "\033[91m"
+        lightgreen = "\033[92m"
+        yellow = "\033[93m"
+        lightblue = "\033[94m"
+        pink = "\033[95m"
+        lightcyan = "\033[96m"
+
+    class bg:
+        black = "\033[40m"
+        red = "\033[41m"
+        green = "\033[42m"
+        orange = "\033[43m"
+        blue = "\033[44m"
+        purple = "\033[45m"
+        cyan = "\033[46m"
+        lightgrey = "\033[47m"
+        black = "\033[30m"
+        red = "\033[31m"
+        green = "\033[32m"
+        orange = "\033[33m"
+        blue = "\033[34m"
+        purple = "\033[35m"
+        cyan = "\033[36m"
+        lightgrey = "\033[37m"
+        darkgrey = "\033[90m"
+        lightred = "\033[91m"
+        lightgreen = "\033[92m"
+        yellow = "\033[93m"
+        lightblue = "\033[94m"
+        pink = "\033[95m"
+        lightcyan = "\033[96m"
+
+    class bg:
+        black = "\033[40m"
+        red = "\033[41m"
+        green = "\033[42m"
+        orange = "\033[43m"
+        blue = "\033[44m"
+        purple = "\033[45m"
+        cyan = "\033[46m"
+        lightgrey = "\033[47m"
+
+
+#  ___                                     ___     _         _            _
+# | _ \_ _ ___  __ _ _ _ __ _ _ __  __ _  | _ \_ _(_)_ _  __(_)_ __  __ _| |
+# |  _/ '_/ _ \/ _` | '_/ _` | '  \/ _` | |  _/ '_| | ' \/ _| | '_ \/ _` | |
+# |_| |_| \___/\__, |_| \__,_|_|_|_\__,_| |_| |_| |_|_||_\__|_| .__/\__,_|_|
+#              |___/                                          |_|
+
+lista = sys.argv[1]
+while True:
+    with open(lista) as f:
+        linea1 = f.readline()
+    lineas = num_lines = sum(1 for line in open(lista))
+    if linea1.strip() == "" and lineas == 0:
+        print(
+            colors.bold
+            + colors.fg.purple
+            + "El archivo no contiene enlaces..."
+            + colors.reset
+        )
+        break
+    elif linea1.strip() == "":
+        print("La línea actual está vacía, pasando a la siguiente")
+        # Borramos primera línea
+        os.system(
+            "tail -n +2 "
+            + lista
+            + " > "
+            + lista
+            + ".temp && mv "
+            + lista
+            + ".temp "
+            + lista
+        )
+    else:
+        os.system('echo "Enlaces pendientes: $(wc -l ' + lista + ' | cut -d " " -f1)"')
+        print(
+            colors.bold
+            + colors.fg.lightred
+            + "Intentando descarga desde: "
+            + colors.reset
+            + linea1.strip()
+        )
+        comando = 'yt-dlp -f "[height <=? 1000]" ' + linea1.strip()
+        resultado = os.system(comando)
+        if resultado:
+            os.system(
+                'notify-send "Hubo un problema con uno de los enlaces de Iwara, ¿continuar?"'
+            )
+            # La descarga no se hace
+            print(
+                colors.bold
+                + colors.fg.lightblue
+                + "ERROR: No se ha podido descargar el enlace"
+            )
+            print(
+                colors.fg.green
+                + "¿Continuar con el siguiente enlace? (y/n): "
+                + colors.reset,
+                end="",
+            )
+            continuar = input()
+            if continuar.lower() == "n":
+                print("Programa terminado")
+                break
+            else:
+                os.system(
+                    "tail -n +2 "
+                    + lista
+                    + " > "
+                    + lista
+                    + ".temp && mv "
+                    + lista
+                    + ".temp "
+                    + lista
+                )
+        else:
+            print(
+                colors.bold
+                + colors.fg.cyan
+                + "Descarga exitosa, se eliminó enlace de la lista."
+            )
+            os.system(
+                "tail -n +2 "
+                + lista
+                + " > "
+                + lista
+                + ".temp && mv "
+                + lista
+                + ".temp "
+                + lista
+            )
+
+
+# import signal
+
+# def handler(signum, frame):
+#     print("Programa interrumpido...")
+#     sys.exit(1)
+
+# signal.signal(signal.SIGINT, handler)
+
+
+###################################################################################################################
+# filenames = sys.argv[1:]                                                                                        #
+# for fname in filenames:                                                                                         #
+#     links = [line.strip() for line in open(fname)]                                                              #
+#     for link in links:                                                                                          #
+#         if link.count("image"):                                                                                 #
+#             print("El link no contiene un video y se omitirá: " + link)                                         #
+#             os.system("tail -n +2 " + fname + " > " + fname + ".temp && mv "+ fname + ".temp " + fname)         #
+#         else:                                                                                                   #
+#             print("Descargando desde: " + link)                                                                 #
+#             comando = "youtube-dl -f 540p " + link                                                              #
+#             resultado = os.system(comando)                                                                      #
+#             if resultado:                                                                                       #
+#                 print("Intentando descarga en formato por defecto...")                                          #
+#                 comando = "youtube-dl " + link                                                                  #
+#                 resultado = os.system(comando)                                                                  #
+#                 if resultado:                                                                                   #
+#                     # La descarga no se hace                                                                    #
+#                     print("ERROR: No se ha podido descargar el enlace")                                         #
+#                     break                                                                                       #
+#                 else:                                                                                           #
+#                     os.system("tail -n +2 " + fname + " > " + fname + ".temp && mv "+ fname + ".temp " + fname) #
+#             else:                                                                                               #
+#                 os.system("tail -n +2 " + fname + " > " + fname + ".temp && mv "+ fname + ".temp " + fname)     #
+###################################################################################################################
+
+###########################################################################
+# filenames = sys.argv[1:]                                                #
+# for fname in filenames:                                                 #
+#     links = [line.strip() for line in open(fname)]                      #
+#     for link in links:                                                  #
+#         if link.count("image"):                                         #
+#             print("El link no contiene un video y se omitirá: " + link) #
+#             os.system(                                                  #
+#                 "tail -n +2 "                                           #
+#                 + fname                                                 #
+#                 + " > "                                                 #
+#                 + fname                                                 #
+#                 + ".temp && mv "                                        #
+#                 + fname                                                 #
+#                 + ".temp "                                              #
+#                 + fname                                                 #
+#             )                                                           #
+#         else:                                                           #
+#             print("Descargando desde: " + link)                         #
+#             comando = "youtube-dl -f 540p " + link                      #
+#             resultado = os.system(comando)                              #
+#             if resultado:                                               #
+#                 # La descarga no se hace                                #
+#                 print("ERROR: No se ha podido descargar el enlace")     #
+#                 break                                                   #
+#             else:                                                       #
+#                 os.system(                                              #
+#                     "tail -n +2 "                                       #
+#                     + fname                                             #
+#                     + " > "                                             #
+#                     + fname                                             #
+#                     + ".temp && mv "                                    #
+#                     + fname                                             #
+#                     + ".temp "                                          #
+#                     + fname                                             #
+#                 )                                                       #
+###########################################################################

@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+from os.path import isfile
+from os import rename
+import sys
+import random
+
+CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+def caracteres(n):
+    return ("".join(random.choice(CHARSET) for i in range(n))).lower()
+
+# print(f"Arguments of the script : {sys.argv[1:]=}")
+
+for fileName in sys.argv[1:]:
+    if isfile(fileName):
+        renombrado = 0
+        while not renombrado:
+            try:
+                nombreNuevo = caracteres(6) + ".bin"
+                print(f"Renombrando \"{fileName}\" a \"{nombreNuevo}\"")
+                rename(fileName, nombreNuevo)
+                renombrado = 1
+            except:
+                print(f"El nombre {nombreNuevo} no funcionó, probando otro...")
+    else:
+        print(f"El argumento introducido {fileName} no es un archivo, ignorando...")

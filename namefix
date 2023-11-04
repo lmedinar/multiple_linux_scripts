@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+if len(sys.argv) < 2:
+    print(
+        "Este script requiere el nombre de los archivos como entradas para arreglarlos..."
+    )
+else:
+    # print(f"Arguments of the script : {sys.argv[1:]=}")
+    c = 0
+    for name in sys.argv:
+        new = name.replace("!", "-")
+        new = new.replace("?", "_")
+        new = new.replace("*", "X")
+        new = new.replace(":", ".")
+        new = new.replace(">", "_")
+        new = new.replace("<", "_")
+        new = new.replace('"', ' ')
+        # print(new)
+        if name != new:
+            os.rename(name, new)
+            c += 1
+    if c > 0:
+        print(f"Se han renombrado {c} archivos")
+    else:
+        print("No se han encontrado caracteres problemáticos...")

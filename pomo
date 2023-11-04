@@ -1,0 +1,54 @@
+#!/usr/bin/bash
+
+reps=4
+t_activo=25
+t_descanso=5
+t_descanso_largo=15
+
+while getopts "r:a:d:l:h" opt; do
+    case "${opt}" in
+        r)
+            reps=$OPTARG
+            ;;
+        a)
+            t_activo=$OPTARG
+            ;;
+        d)
+            t_descanso=$OPTARG
+            ;;
+        l)
+            t_descanso_largo=$OPTARG
+            ;;
+        h)
+            echo "Ociones:"
+            echo "-r <repeticiones>"
+            echo "-a <minutos de actividad>"
+            echo "-d <minutos de descanso corto>"
+            echo "-l <minutos de descanso largo>"
+            exit 1
+            ;;
+        *)
+            
+            ;;
+    esac
+done
+
+ciclo=1
+
+notify-send "Inicia pomodoro..."
+while (($ciclo <= $reps)); do
+    termdown -f doom -T "Trabajando:" "${t_activo}m"
+    aplay -q ~/scripts/alarma4.wav &
+    descanso=$t_descanso
+    if [ $ciclo -eq 4 ]
+    then
+        descanso=$t_descanso_largo
+    fi
+    notify-send "Inicio de descanso..."
+    termdown -f doom -T "Descanso:" "${descanso}m"
+    aplay -q ~/scripts/alarma3.wav &
+    ciclo=$((ciclo+1))
+    notify-send "Fin de descanso..."
+done
+
+echo "Ronda de pomodoro finalizada"

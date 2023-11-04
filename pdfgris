@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# gs \
+#   -sDEVICE=pdfwrite \
+#   -dProcessColorModel=/DeviceGray \
+#   -dColorConversionStrategy=/Gray \
+#   -dPDFUseOldCMS=false \
+#   -o out.pdf \
+#   -f in.pdf
+
+for filename in "$@"
+do
+    if [ "${filename##*.}" = "pdf" ]
+    then
+	echo ""
+	echo "Se convertirá el archivo $filename..."
+	echo ""
+	nombre="${filename%.*}"
+	# ffmpeg -i "$filename" -ab 320k -map_metadata 0 -id3v2_version 3 "$nombre.mp3" && rm "$filename"
+	gs \
+	    -sDEVICE=pdfwrite \
+	    -dProcessColorModel=/DeviceGray \
+	    -dColorConversionStrategy=/Gray \
+	    -dPDFUseOldCMS=false \
+	    -o "$nombre.gris.pdf" \
+	    -f "$filename" && rm "$filename"
+
+    else
+	echo "El archivo $filename no es FLAC o WAV, se omitirá..."
+    fi
+done	    

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+ip link set wlp3s0 down
+sleep 0.5
+macchanger -r wlp3s0
+sleep 0.5
+ip link set wlp3s0 up
+    

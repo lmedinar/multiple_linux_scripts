@@ -1,0 +1,4 @@
+#!/bin/bash
+/usr/bin/thunderbird &
+sleep 300 # 5 minutes
+kill $!
