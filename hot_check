@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+disp_temp=$(sensors -u | awk 'NR == 29 {printf "%.0f", $2}')
+if (( disp_temp > 56 ))
+then
+    check_for_low=1
+else
+    check_for_low=0
+fi
+
+if (( check_for_low == 1 ))
+then
+    echo "Se avisará cuando baje la temperatura"
+else
+    echo "Se avisará cuando suba la temperatura"
+fi
+
+while true; do
+    disp_temp=$(sensors -u | awk 'NR == 29 {printf "%.0f", $2}')
+    printf "  Temperatura actual: $disp_temp \r"
+    if (( disp_temp > 94 && check_for_low == 0))
+    then
+	aplay -q ~/scripts/alarma3.wav
+	notify-send "El CPU está caliente"
+	printf "  Temperatura final: $disp_temp"
+	break
+    fi
+    if (( disp_temp < 56 && check_for_low))
+    then
+	aplay -q ~/scripts/alarma3.wav
+	notify-send "Baja temperatura alcanzada"
+	printf "  Temperatura final: $disp_temp"
+	break
+    fi
+    sleep 5
+done

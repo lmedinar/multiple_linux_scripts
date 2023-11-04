@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+cd /home/staineko/Videos/.H/mmd
+iwara-multi lista
+
+cd /home/staineko/Videos/.H/new
+vid-multi lista

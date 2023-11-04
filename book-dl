@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+id_libro=$( cut -d '=' -f2 <<< "$1" )
+
+wget -c $(lynx -dump "http://library.lol/main/$id_libro" | awk '/http/{print $2}' | awk 'NR==1')

@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+#######################
+# Opciones con dialog #
+#######################
+
+# dialog --clear --backtitle "Backtitle here" --title "Title here" --menu "Choose one of the following options:" 15 40 4 \
+    # 1 "Option 1" \
+    # 2 "Option 2" \
+    # 3 "Option 3"
+
+#######################
+# Opciones con select #
+#######################
+
+# PS3="Please choose an option "
+# select option in go stay wait quit
+# do
+#     case $option in
+#         go) 
+#             echo "Going";;
+#         stay|wait) 
+#             echo "Standing by";;
+#         quit)
+#             break;;
+#      esac
+# done
+
+#######################
+# Opciones con dialog #
+#######################
+dir_base=$(pwd)
+cd ~/Help
+archivo=$(fzf --color='info:143,border:7,spinner:3' --preview 'cat {}')
+if [ $? = "130" ]
+then
+    echo "Se ha cancelado la operación"
+else
+    exec 3>&1
+    seleccion=$(dialog \
+		    --no-cancel \
+		    --colors \
+		    --title "Seleccione acción" \
+		    --menu "A dónde mandar el código:" \
+		    12 40 4 \
+		    1 "Portapapeles" \
+		    2 "pygmentizer" \
+		    3 "emacsclient" \
+		    4 "Copiar ruta" \
+		    5 "Salir" \
+		    2>&1 1>&3)
+    if [ "$?" != "0" ]
+    then
+	echo "Se ha cancelado la operación"
+    else
+	case $seleccion in
+	    "1")
+		# echo "$archivo"
+		echo "Enviando al clipboard..."
+		cat "$archivo"
+		# cat "$archivo" | xclip -selection c
+		cat "$archivo" | xsel -ib # Otra forma de trabajar con el clipboard
+		# sleep 0.2
+		# printf "Presione enter para salir..."
+		# read
+		;;
+	    "2")
+		echo "--- $archivo ----"
+		echo ""
+		pygmentize -g "$archivo"
+		echo ""
+		echo "--------------------------------"
+		printf "Presione enter para salir..."
+		read
+		;;
+	    "3")
+		emacsclient -t "$archivo"
+		;;
+	    "4")
+		# echo "$archivo"
+		echo "Enviando ruta al clipboard..."
+		echo "$archivo"
+		# cat "$archivo" | xclip -selection c
+		echo "$archivo" | xsel -ib # Otra forma de trabajar con el clipboard
+		# sleep 0.2
+		# printf "Presione enter para salir..."
+		# read
+		;;
+	    *)
+		echo "No se realizó ninugna acción"
+		;;
+	esac
+    fi
+fi
+# echo $seleccion
+# echo $archivo
+cd $dir_base
+
